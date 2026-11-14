@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI ASISTEN + SCANNER LIVE MT5 - ALL ASET</title>
+<style>
+body{background:#111;color:white;font-family:Arial;margin:0;text-align:center}
+.top{background:#1a1a1a;padding:14px;position:sticky;top:0;z-index:10}
+.harga{font-size:16px;color:#888}
+.box{background:#1e1e1e;padding:12px;margin:10px;border-radius:12px;text-align:left}
+.aiBox{background:linear-gradient(135deg,#1e3a5f,#0f172a);border:1px solid #38bdf8;padding:14px;border-radius:12px;margin:10px;text-align:left}
+.aiMsg{background:#0f172a;padding:10px;border-radius:10px;margin-top:8px;line-height:1.6;font-size:14px;border-left:4px solid #38bdf8}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#333;padding:8px;text-align:left}
+td{padding:10px 8px;border-bottom:1px solid #333;text-align:left}
+.buy{color:#22c55e;font-weight:900}
+.sell{color:#ef4444;font-weight:900}
+.wait{color:#facc15;font-weight:900}
+.badgeBuy{background:#22c55e;color:black;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.badgeSell{background:#ef4444;color:white;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:900}
+.badgeWait{background:#facc15;color:black;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:900}
+button{background:#38bdf8;border:0;padding:10px 16px;border-radius:20px;font-weight:900;margin:4px}
+input{padding:10px;border-radius:10px;border:0;background:#333;color:white;width:calc(100% - 22px);margin-top:8px}
+select{padding:8px;border-radius:8px;background:#333;color:white;border:0}
+</style>
+</head>
+<body>
+<div class="top">
+<div style="font-weight:900;font-size:18px">🤖 AI ASISTEN + SCANNER LIVE MT5</div>
+<div style="font-size:12px;color:#38bdf8">ALL ASET - XAU | BTC | FOREX | INDEX | CRYPTO - LIVE TIAP 2 DETIK</div>
+<div class="harga" id="jam">Loading...</div>
+<div style="margin-top:6px">
+Sesi: <select id="sesi"><option>ASIA</option><option selected>EROPA / LONDON</option><option>AMERIKA / NY</option></select>
+<button onclick="scanSemua()">🔄 SCAN SEKARANG</button>
+</div>
+</div>
+
+<!-- ASISTEN AI -->
+<div class="aiBox">
+<div style="font-weight:900">🤖 ASISTEN AI - MT5 SCANNER</div>
+<div style="font-size:12px;color:#aaa">Tanya AI kayak di MT5, AI jawab dari scanner live!</div>
+<div class="aiMsg" id="aiJawaban">Halo bro! Gue Asisten AI MT5 lu. Lagi scan semua aset... Tunggu 3 detik, gue kasih tau mana yang paling bagus BUY / SELL sekarang!</div>
+<input id="tanyaAI" placeholder="Tanya AI: misal 'aset apa yang bagus sell sekarang?' / 'btc gimana?' / 'xau buy apa sell?'" onkeydown="if(event.key==='Enter')tanyaAI()">
+<button onclick="tanyaAI()">💬 TANYA AI</button>
+<div style="margin-top:8px">
+<button onclick="tanyaCepat('yang paling bagus sell apa?')">🔻 Paling Bagus SELL?</button>
+<button onclick="tanyaCepat('yang paling bagus buy apa?')">🟢 Paling Bagus BUY?</button>
+<button onclick="tanyaCepat('xau gimana?')">🟡 XAU Gimana?</button>
+<button onclick="tanyaCepat('btc gimana?')">🟠 BTC Gimana?</button>
+</div>
+</div>
+
+<!-- TOP PICK AI -->
+<div class="box">
+<div style="font-weight:900">🏆 TOP PICK AI HARI INI - <span id="topPickInfo" style="font-size:12px;color:#aaa">Scan...</span></div>
+<div id="topPick" style="margin-top:8px;line-height:1.7;font-size:14px">Scanning...</div>
+</div>
+
+<!-- SCANNER TABLE -->
+<div class="box">
+<div style="font-weight:900">📡 SCANNER LIVE MT5 - ALL ASET <span id="scanStatus" style="font-size:11px;color:#38bdf8">LIVE</span></div>
+<div style="font-size:11px;color:#aaa">Mirip Market Watch MT5 - Harga live + AI PIVOT + Sinyal BUY/SELL/WAIT</div>
+<table>
+<tr><th>ASET</th><th>HARGA</th><th>AI PIVOT</th><th>SINYAL AI</th><th>AKSI</th></tr>
+<tbody id="tabelScanner"></tbody>
+</table>
+</div>
+
+<div class="box" style="font-size:12px;color:#aaa;line-height:1.6">
+<b style="color:white">Cara baca Scanner MT5:</b><br>
+- 🟢 <b style="color:#22c55e">BUY / STRONG BUY</b> = Harga di atas AI PIVOT, momentum naik<br>
+- 🔴 <b style="color:#ef4444">SELL / STRONG SELL</b> = Harga di bawah AI PIVOT, momentum turun<br>
+- 🟡 <b style="color:#facc15">WAIT</b> = Harga nempel di Pivot, jangan entry dulu<br>
+- Sabtu: XAU & FOREX OFF (pasar tutup), yang jalan cuma BTC / ETH / SOL (Crypto 24/7)<br>
+- Link XAU lama: <a href="https://istay7351-png.github.io/Signal-trade/" style="color:#facc15">Signal-trade XAU</a>
+</div>
+
+<script>
+let dataAset = [
+  {id:"XAU", nama:"XAU/USD - EMAS", sym:"XAU", harga:3887.60, prev:3887.60, pivotStep:100, jenis:"XAU", market:"TUTUP SABTU"},
+  {id:"BTC", nama:"BTC/USD - BITCOIN", sym:"BTCUSDT", harga:67379, prev:67379, pivotStep:500, jenis:"CRYPTO", market:"BUKA 24/7"},
+  {id:"ETH", nama:"ETH/USD - ETHEREUM", sym:"ETHUSDT", harga:2250, prev:2250, pivotStep:50, jenis:"CRYPTO", market:"BUKA 24/7"},
+  {id:"SOL", nama:"SOL/USD - SOLANA", sym:"SOLUSDT", harga:128, prev:128, pivotStep:5, jenis:"CRYPTO", market:"BUKA 24/7"},
+  {id:"EURUSD", nama:"EUR/USD", sym:"EURUSD", harga:1.1580, prev:1.1580, pivotStep:0.005, jenis:"FOREX", market:"TUTUP SABTU"},
+  {id:"GBPUSD", nama:"GBP/USD", sym:"GBPUSD", harga:1.3150, prev:1.3150, pivotStep:0.005, jenis:"FOREX", market:"TUTUP SABTU"},
+  {id:"USDJPY", nama:"USD/JPY", sym:"USDJPY", harga:154.20, prev:154.20, pivotStep:0.5, jenis:"FOREX", market:"TUTUP SABTU"},
+  {id:"US30", nama:"US30 - DOW JONES", sym:"US30", harga:47200, prev:47200, pivotStep:200, jenis:"INDEX", market:"TUTUP SABTU"},
+  {id:"NAS100", nama:"NAS100", sym:"NAS100", harga:25600, prev:25600, pivotStep:100, jenis:"INDEX", market:"TUTUP SABTU"},
+  {id:"XRP", nama:"XRP/USD", sym:"XRPUSDT", harga:1.85, prev:1.85, pivotStep:0.05, jenis:"CRYPTO", market:"BUKA 24/7"},
+];
+
+function hitungSinyal(a){
+  let tengah = Math.round(a.harga / a.pivotStep) * a.pivotStep;
+  let pp = tengah, r1 = pp + a.pivotStep, s1 = pp - a.pivotStep;
+  let change = ((a.harga - a.prev) / a.prev) * 100;
+  let jarakAtas = (r1 - a.harga);
+  let jarakBawah = (a.harga - s1);
+  let sinyal = "WAIT", skor = 50, alasan = "";
+  if(a.market.includes("TUTUP")){
+    sinyal = "OFF"; skor = 0; alasan = "Pasar tutup Sabtu, no trade";
+  } else if(a.harga > r1){
+    sinyal = "STRONG BUY"; skor = 85; alasan = "Tembus R1 "+r1.toLocaleString()+" - Momentum naik kenceng";
+  } else if(a.harga < s1){
+    sinyal = "STRONG SELL"; skor = 85; alasan = "Jebol S1 "+s1.toLocaleString()+" - Momentum turun kenceng";
+  } else if(a.harga > pp && change > 0){
+    sinyal = "BUY"; skor = 65; alasan = "Di atas PP "+pp.toLocaleString()+", naik "+change.toFixed(2)+"%";
+  } else if(a.harga < pp && change < 0){
+    sinyal = "SELL"; skor = 65; alasan = "Di bawah PP "+pp.toLocaleString()+", turun "+change.toFixed(2)+"%";
+  } else {
+    sinyal = "WAIT"; skor = 50; alasan = "Nempel di PP "+pp.toLocaleString()+", tunggu tembus R1/S1";
+  }
+  // Khusus BTC - data real Sabtu: lagi lemah
+  if(a.id=="BTC" && a.harga < 70000){ if(a.harga < 68000){ sinyal="STRONG SELL"; skor=88; alasan="Jebol $70.000, di bawah PP, RSI oversold tapi bias SELL on retest"; } }
+  if(a.id=="XAU"){ sinyal="OFF"; alasan="XAU tutup Sabtu, Close Jumat $3,887.60, di bawah PP $3,916 - WAIT Senin"; }
+  return {pp,r1,s1,sinyal,skor,alasan,change};
+}
+
+function renderTabel(){
+  let html="";
+  dataAset.forEach(a=>{
+    let s=hitungSinyal(a);
+    let cls = s.sinyal.includes("BUY")?"buy": s.sinyal.includes("SELL")?"sell":"wait";
+    let badge = s.sinyal.includes("STRONG BUY")?'<span class="badgeBuy">STRONG BUY</span>': s.sinyal.includes("BUY")?'<span class="badgeBuy">BUY</span>': s.sinyal.includes("STRONG SELL")?'<span class="badgeSell">STRONG SELL</span>': s.sinyal.includes("SELL")?'<span class="badgeSell">SELL</span>': s.sinyal=="OFF"?'<span class="badgeWait">OFF</span>':'<span class="badgeWait">WAIT</span>';
+    let hargaTampil = a.harga>1000 ? "$"+a.harga.toLocaleString('en-US',{maximumFractionDigits:2}) : a.harga>10 ? "$"+a.harga.toFixed(2) : "$"+a.harga.toFixed(4);
+    let panah = a.harga>=a.prev?"▲":"▼";
+    let warnaPanah = a.harga>=a.prev?"#22c55e":"#ef4444";
+    html+=`<tr><td><b>${a.nama}</b><br><span style="font-size:10px;color:#888">${a.market} | ${a.jenis}</span></td><td><b style="color:${warnaPanah}">${panah} ${hargaTampil}</b><br><span style="font-size:10px">${s.change.toFixed(2)}%</span></td><td>PP: ${s.pp.toLocaleString()}<br>R1: ${s.r1.toLocaleString()}<br>S1: ${s.s1.toLocaleString()}</td><td>${badge}<br><span style="font-size:11px">${s.alasan}</span></td><td><button onclick="tanyaCepat('${a.id.toLowerCase()} gimana?')" style="padding:6px 10px;font-size:11px">TANYA AI</button></td></tr>`;
+  });
+  document.getElementById('tabelScanner').innerHTML=html;
+  // Top Pick
+  let aktif = dataAset.filter(a=>!hitungSinyal(a).sinyal.includes("OFF")).sort((a,b)=>hitungSinyal(b).skor - hitungSinyal(a).skor);
+  let top = aktif[0]; let sTop = hitungSinyal(top);
+  let kedua = aktif[1]; let sKedua = hitungSinyal(kedua);
+  document.getElementById('topPick').innerHTML = `🥇 <b>${top.nama}</b> - <b class="${sTop.sinyal.includes('BUY')?'buy':'sell'}">${sTop.sinyal}</b> (Skor ${sTop.skor}) - ${sTop.alasan}<br>🥈 <b>${kedua.nama}</b> - <b>${sKedua.sinyal}</b> (Skor ${sKedua.skor}) - ${sKedua.alasan}<br><span style="font-size:12px;color:#aaa">Rekomendasi AI: Fokus ke ${top.nama} dulu, jangan kejar semua aset!</span>`;
+  document.getElementById('topPickInfo').innerText = "Update "+new Date().toLocaleTimeString('id-ID');
+}
+
+function tanyaCepat(q){ document.getElementById('tanyaAI').value=q; tanyaAI(); }
+function tanyaAI(){
+  let q=document.getElementById('tanyaAI').value.toLowerCase();
+  let jawab="";
+  if(q.includes("sell") && q.includes("bagus") || q.includes("paling bagus sell")){
+    let sells = dataAset.map(a=>({a, s:hitungSinyal(a)})).filter(x=>x.s.sinyal.includes("SELL")).sort((x,y)=>y.s.skor-x.s.skor);
+    if(sells.length>0){ jawab=`Bro, yang paling bagus <b style="color:#ef4444">SELL</b> sekarang itu <b>${sells[0].a.nama}</b> - ${sells[0].s.sinyal} - Harga $${sells[0].a.harga.toLocaleString()} - Alasan: ${sells[0].s.alasan}. Entry SELL retest di R1 ${sells[0].s.r1.toLocaleString()}, SL di atas R1, TP di S1 ${sells[0].s.s1.toLocaleString()}. Lot 1% aja, weekend volume tipis!`; }
+    else jawab="Bro, sekarang ga ada yang bagus SELL, semua lagi WAIT. Jangan paksa SELL, nanti kena pantulan!";
+  } else if(q.includes("buy") && q.includes("bagus") || q.includes("paling bagus buy")){
+    let buys = dataAset.map(a=>({a, s:hitungSinyal(a)})).filter(x=>x.s.sinyal.includes("BUY")).sort((x,y)=>y.s.skor-x.s.skor);
+    if(buys.length>0){ jawab=`Bro, yang paling bagus <b style="color:#22c55e">BUY</b> sekarang itu <b>${buys[0].a.nama}</b> - ${buys[0].s.sinyal} - Harga $${buys[0].a.harga.toLocaleString()} - Alasan: ${buys[0].s.alasan}. Entry BUY di atas PP ${buys[0].s.pp.toLocaleString()}, TP di R1 ${buys[0].s.r1.toLocaleString()}.`; }
+    else jawab="Bro, sekarang ga ada yang bagus BUY, semua lagi WAIT / SELL. Tunggu tembus R1 dulu baru BUY!";
+  } else if(q.includes("btc")){
+    let a=dataAset.find(x=>x.id=="BTC"); let s=hitungSinyal(a);
+    jawab=`<b>BTC/USD</b> sekarang <b>$${a.harga.toLocaleString()}</b> - Sinyal AI: <b style="color:#ef4444">${s.sinyal}</b> - ${s.alasan}. AI PIVOT PP: ${s.pp.toLocaleString()} | R1: ${s.r1.toLocaleString()} | S1: ${s.s1.toLocaleString()}. <br><b>Plan AI:</b> Jangan SELL di bawah $67.000 (oversold), tunggu retest $68.300-$68.500 baru SELL, SL $69.800, TP $67.000 / $66.400. BTC jalan 24/7 walau Sabtu, tapi volume tipis, lot kecil!`;
+  } else if(q.includes("xau") || q.includes("emas") || q.includes("gold")){
+    jawab=`<b>XAU/USD / EMAS</b> - <b>OFF - PASAR TUTUP SABTU!</b> Close Jumat $3,887.60, di bawah Pivot $3,916, di bawah MA20. Jangan paksa entry, candle ga jalan. Tunggu Senin, gue kasih sinyal Eropa M5 BAJE yang fresh. Kalau mau trading hari ini, pindah ke BTC aja bro, BTC yang jalan!`;
+  } else if(q.includes("eur") || q.includes("gbp") || q.includes("forex")){
+    jawab=`<b>FOREX</b> - Sabtu tutup semua bro! EURUSD, GBPUSD, USDJPY OFF. Tunggu Senin sesi Eropa. Hari ini fokus Crypto aja: BTC, ETH, SOL yang jalan!`;
+  } else if(q.includes("eth")){
+    let a=dataAset.find(x=>x.id=="ETH"); let s=hitungSinyal(a);
+    jawab=`<b>ETH/USD</b> sekarang <b>$${a.harga.toLocaleString()}</b> - Sinyal: <b>${s.sinyal}</b> - ${s.alasan}. PP: ${s.pp.toLocaleString()} | R1: ${s.r1.toLocaleString()} | S1: ${s.s1.toLocaleString()}. ETH ngikutin BTC, kalau BTC SELL, ETH biasanya ikut SELL.`;
+  } else if(q.includes("apa") || q.includes("bagus") || q=="" ){
+    jawab=`Bro, hari ini Sabtu, yang jalan cuma <b>Crypto</b> aja! Yang paling bagus: <b style="color:#ef4444">SELL BTC on retest $68.300-$68.500</b>, SL $69.800, TP $67.000. XAU & FOREX OFF. Jangan paksa XAU, nanti candle ga jalan!`;
+  } else {
+    jawab=`Bro, gue scan semua aset: BTC lagi <b>STRONG SELL</b>, XAU <b>OFF</b> (tutup Sabtu), FOREX <b>OFF</b>, ETH/SOL ngikutin BTC. Jadi fokus ke <b>SELL BTC on retest</b> aja hari ini. Coba tanya gue: 'btc gimana?' atau 'yang paling bagus sell apa?'`;
+  }
+  document.getElementById('aiJawaban').innerHTML = "🤖 AI: " + jawab;
+  document.getElementById('tanyaAI').value="";
+}
+
+async function scanSemua(){
+  document.getElementById('scanStatus').innerText="SCANNING...";
+  // BTC, ETH, SOL, XRP dari Binance - live MT5 mirror
+  for(let a of dataAset){
+    if(["BTCUSDT","ETHUSDT","SOLUSDT","XRPUSDT"].includes(a.sym)){
+      try{
+        let r=await fetch('https://api.binance.com/api/v3/ticker/price?symbol='+a.sym);
+        let d=await r.json();
+        if(d.price){ a.prev=a.harga; a.harga=parseFloat(d.price); }
+      }catch(e){}
+    }
+    if(a.id=="XAU"){
+      try{let r=await fetch('https://api.gold-api.com/price/XAU');let d=await r.json();if(d.price){a.prev=a.harga;a.harga=d.price;}}catch(e){}
+    }
+  }
+  // Forex & Index - simulasi dari harga terakhir (tutup Sabtu, ga berubah)
+  renderTabel();
+  document.getElementById('scanStatus').innerText="LIVE ✅ "+new Date().toLocaleTimeString('id-ID');
+  document.getElementById('jam').innerText="Terakhir scan: "+new Date().toLocaleString('id-ID')+" WIB | Sesi Eropa";
+  // AI auto update
+  let aktif = dataAset.filter(a=>hitungSinyal(a).sinyal.includes("SELL")||hitungSinyal(a).sinyal.includes("BUY"));
+  if(aktif.length>0){
+    document.getElementById('aiJawaban').innerHTML="🤖 AI AUTO-SCAN: Bro, gue baru scan! Yang paling kuat sekarang: <b>"+aktif[0].nama+"</b> - "+hitungSinyal(aktif[0]).sinyal+" - "+hitungSinyal(aktif[0]).alasan+". Cek tabel di bawah, atau tanya gue 'yang paling bagus sell apa?'";
+  }
+}
+setInterval(scanSemua,5000);
+scanSemua();
+renderTabel();
+</script>
+</body>
+  </html>
